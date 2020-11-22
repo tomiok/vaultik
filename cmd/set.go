@@ -11,10 +11,13 @@ var setCmd = &cobra.Command{
 	Short: " ",
 	Long: ` `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("set called")
+		for _, s := range args {
+			fmt.Println(s)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(setCmd)
+	setCmd.Flags().StringP("key", "k", "", "The key to encrypt the secret")
 }

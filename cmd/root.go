@@ -13,13 +13,11 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "testvault",
+	Use:   "vaultik",
 	Short: "A brief description of your application",
 	Long:  `this is VAULTIK`,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		//TODO change this with tomatto-logger
@@ -35,14 +33,17 @@ func Execute() {
 	}
 }
 
+var (
+	filename    string
+	encodingKey string
+)
+
 func init() {
 	cobra.OnInitialize(initConfig)
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.vaultik.yaml)")
 
-	//
-	rootCmd.Flags().BoolP("help", "h", false, "Call the help for using Vaultik")
-	//
-	rootCmd.Flags().StringP("example", "e", "", "check out a simple example")
+
+	rootCmd.PersistentFlags().StringVarP(&filename, "file", "f", "", "File vault")
+	rootCmd.PersistentFlags().StringVarP(&encodingKey, "key", "k", "", "Encoding key")
 }
 
 // initConfig reads in config file and ENV variables if set.
