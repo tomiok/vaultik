@@ -7,5 +7,3 @@
 #### Add commands to Vaultik
 * SET command: `cobra add set`
 * GET command: `cobra add get`
-
-#### Add commands to Vaultik
