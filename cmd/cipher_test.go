@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -18,8 +17,6 @@ func Test_encrypt(t *testing.T) {
 	if s == "" {
 		t.Fail()
 	}
-
-	fmt.Print(s)
 }
 
 func Test_decrypt(t *testing.T) {
