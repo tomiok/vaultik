@@ -32,6 +32,12 @@ func split(s string) (key, value string) {
 //setValue key is the actual key to identify the entry.
 func (v *vaultik) setValue(key, value string) error {
 
+	value, err := v.getValue(key)
+
+	if value != "" || !errors.Is(err, errNotFound) {
+		return errors.New("cannot set an existing value, use UPDATE command instead")
+	}
+	
 	return nil
 }
 
