@@ -42,7 +42,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVarP(&filename, "file", "f", "", "File vault")
-	rootCmd.PersistentFlags().StringVarP(&encodingKey, "key", "k", "", "Encoding key")
+	rootCmd.PersistentFlags().StringVarP(&encodingKey, "encodingKey", "k", "", "Encoding encodingKey")
 }
 
 // initConfig reads in config file and ENV variables if set.

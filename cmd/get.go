@@ -8,8 +8,8 @@ import (
 
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Get the value, the cipher key is needed",
-	Long: `Get the value, the cipher key is needed (Long)`,
+	Short: "Get the value, the cipher encodingKey is needed",
+	Long: `Get the value, the cipher encodingKey is needed (Long)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("")
 	},
