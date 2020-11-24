@@ -14,6 +14,7 @@ func newVaultik(encodingKey, filename string) vaultik {
 
 //setValue key is the actual key to identify the entry.
 func (v *vaultik) setValue(key, value string) error {
+
 	return nil
 }
 
