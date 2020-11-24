@@ -41,7 +41,6 @@ var (
 func init() {
 	cobra.OnInitialize(initConfig)
 
-
 	rootCmd.PersistentFlags().StringVarP(&filename, "file", "f", "", "File vault")
 	rootCmd.PersistentFlags().StringVarP(&encodingKey, "key", "k", "", "Encoding key")
 }
@@ -58,13 +57,12 @@ func initConfig() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-
-		// Search config in home directory with name ".vaultik" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".vaultik")
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	// read in environment variables that match
+	viper.AutomaticEnv()
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {

@@ -8,8 +8,8 @@ import (
 
 var setCmd = &cobra.Command{
 	Use:   "set",
-	Short: " ",
-	Long: ` `,
+	Short: "Set the value and save it in the file system, the key is required",
+	Long: `Set the value and save it in the file system, the key is required (Long)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, s := range args {
 			fmt.Println(s)
