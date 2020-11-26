@@ -31,12 +31,20 @@ func split(s string) (key, value string) {
 
 //setValue key is the actual key to identify the entry.
 func (v *vaultik) setValue(key, value string) error {
+	//check if the file exists
+	if _, err := os.Stat(filename); err != nil {
+		return err
+	}
 
+	// figure out if the value is here
 	value, err := v.getValue(key)
 
+	// if the value is already set, cannot pursue, should use UPDATE command instead
 	if value != "" || !errors.Is(err, errNotFound) {
 		return errors.New("cannot set an existing value, use UPDATE command instead")
 	}
+
+	str := joinkv(key, value)
 	
 	return nil
 }
@@ -85,4 +93,8 @@ func (v *vaultik) readAll() ([]string, error) {
 	kv := strings.Split(decrypted, "\b")
 
 	return kv, nil
+}
+
+func joinkv(key, value string) string {
+	return key + separator + value
 }
