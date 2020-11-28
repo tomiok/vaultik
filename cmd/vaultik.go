@@ -32,7 +32,7 @@ func split(s string) (key, value string) {
 //setValue key is the actual key to identify the entry.
 func (v *vaultik) setValue(key, value string) error {
 	//check if the file exists
-	if _, err := os.Stat(filename); err != nil {
+	if _, err := os.Stat(v.filename); err != nil {
 		return err
 	}
 
@@ -45,6 +45,32 @@ func (v *vaultik) setValue(key, value string) error {
 	}
 
 	str := joinkv(key, value)
+
+	bytes, err := ioutil.ReadFile(v.filename)
+
+	if err != nil {
+		return err
+	}
+
+	decrypted, err := decrypt(v.encodingKey, string(bytes))
+
+	if err != nil {
+		return err
+	}
+
+	str = decrypted + "\n" + str
+
+	encrypted, err := encrypt(v.encodingKey, str)
+
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(v.filename, []byte(encrypted), 0755)
+
+	if err != nil {
+		return err
+	}
 	
 	return nil
 }
