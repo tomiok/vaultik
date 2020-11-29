@@ -70,6 +70,10 @@ func decrypt(key, cipherText string) (string, error) {
 		return "", err
 	}
 
+	if len(text) == 0 {
+		return "",errFileEmpty
+	}
+
 	block, err := aes.NewCipher(cipherKey)
 
 	if err != nil {
