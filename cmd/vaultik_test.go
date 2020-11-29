@@ -27,6 +27,7 @@ func Test_SetValue(t *testing.T) {
 func Test_readAll(t *testing.T) {
 	vault := newVaultik("someKey", "C:\\Users\\Tomás\\Downloads\\keys.txt")
 
-	_, err := vault.readAll()
+	s, err := vault.readAll()
+	fmt.Println(s)
 	fmt.Println(err)
 }
