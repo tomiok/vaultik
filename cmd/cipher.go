@@ -32,6 +32,7 @@ func encrypt(key, value string) (string, error) {
 	}
 
 	// cipherKey must be 16, 32 or 48 bytes long
+	// 16 bytes (or 128 bits) for this example
 	block, err := aes.NewCipher(cipherKey)
 
 	if err != nil {
@@ -43,17 +44,20 @@ func encrypt(key, value string) (string, error) {
 	// Initialization Vector (IV) needs to be unique but not secure
 	cipherText := make([]byte, aes.BlockSize+len(plainTextValue))
 
-	// put the IV at the beginning of the slice
+	// Put the IV at the beginning of the slice
 	iv := cipherText[:aes.BlockSize]
 
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", err
 	}
 
+	// Get the stream for cipher in feedback mode
 	stream := cipher.NewCFBEncrypter(block, iv)
 
+	// Add the plain text to the last part from the IV
 	stream.XORKeyStream(cipherText[aes.BlockSize:], plainTextValue)
 
+	// Format in base 16
 	return fmt.Sprintf("%x", cipherText), nil
 }
 
@@ -71,9 +75,10 @@ func decrypt(key, cipherText string) (string, error) {
 	}
 
 	if len(text) == 0 {
-		return "",errFileEmpty
+		return "", errFileEmpty
 	}
 
+	// create a new bock cipher
 	block, err := aes.NewCipher(cipherKey)
 
 	if err != nil {
@@ -87,9 +92,13 @@ func decrypt(key, cipherText string) (string, error) {
 	iv := text[:aes.BlockSize]
 	text = text[aes.BlockSize:]
 
+	// Get the stream for cipher in feedback mode
+
 	stream := cipher.NewCFBDecrypter(block, iv)
 
 	// XORKeyStream can work in-place if the two arguments are the same.
 	stream.XORKeyStream(text, text)
+
+	// return as readable plain text
 	return string(text), nil
 }

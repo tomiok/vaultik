@@ -23,6 +23,7 @@ func newVaultik(encodingKey, filename string) vaultik {
 	}
 }
 
+// split the key value by the \t
 func split(s string) (key, value string) {
 	if s != "" {
 
@@ -135,6 +136,7 @@ func (v *vaultik) readAll() ([]string, error) {
 	return kv, nil
 }
 
+// make only one strign with key and value, glue with \t
 func joinkv(key, value string) string {
 	return key + separator + value
 }

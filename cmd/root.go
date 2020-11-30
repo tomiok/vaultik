@@ -24,6 +24,7 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	if b, _ := rootCmd.Flags().GetBool("help"); b {
 		fmt.Print("toggled2")
 	}
