@@ -136,7 +136,7 @@ func (v *vaultik) readAll() ([]string, error) {
 	return kv, nil
 }
 
-// make only one strign with key and value, glue with \t
+// make only one string with key and value, glue with \t
 func joinkv(key, value string) string {
 	return key + separator + value
 }
