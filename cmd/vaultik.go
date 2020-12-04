@@ -8,8 +8,10 @@ import (
 )
 
 const separator = "\t" // key/value separator in the encrypted file
-var errNotFound = errors.New("key not found")
-var errFileEmpty = errors.New("file is empty")
+var (
+	errNotFound  = errors.New("key not found")
+	errFileEmpty = errors.New("file is empty")
+)
 
 type vaultik struct {
 	encodingKey string // is the key to encrypt the entry (the value given).

@@ -5,11 +5,15 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	filename    string
+	encodingKey string
+	cfgFile     string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -25,6 +29,7 @@ func Execute() {
 		os.Exit(1)
 	}
 
+	// tests flags
 	if b, _ := rootCmd.Flags().GetBool("help"); b {
 		fmt.Print("toggled2")
 	}
@@ -33,11 +38,6 @@ func Execute() {
 		fmt.Print("example2")
 	}
 }
-
-var (
-	filename    string
-	encodingKey string
-)
 
 func init() {
 	cobra.OnInitialize(initConfig)
