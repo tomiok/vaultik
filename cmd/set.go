@@ -10,7 +10,6 @@ var setCmd = &cobra.Command{
 	Short: "Set the value and save it in the file system, the encodingKey and filename are required",
 	Long:  `Set the value and save it in the file system, the encodingKey and filename are required (Long)`,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		vault := newVaultik(encodingKey, filename)
 
 		if len(args) < 2 {

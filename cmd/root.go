@@ -17,14 +17,14 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "vaultik",
-	Short: "A brief description of your application",
-	Long:  `this is VAULTIK`,
+	Use:                        "vaultik",
+	Short:                      "A brief description of your application",
+	Long:                       `this is VAULTIK`,
+	Example:                    "",
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		//TODO change this with tomatto-logger
 		fmt.Println(err)
 		os.Exit(1)
 	}
