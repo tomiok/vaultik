@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -11,8 +12,6 @@ import (
 var (
 	errNotFound  = errors.New("key not found")
 	errFileEmpty = errors.New("file is empty")
-
-	vault *vaultik
 )
 
 type vaultik struct {
@@ -20,13 +19,7 @@ type vaultik struct {
 }
 
 func newVaultik(encodingKey string) {
-	s, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	p := filepath.Join(s, filepath.Base(".vaultik"))
-	f, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := openVaultikInHomeDir()
 
 	if err != nil {
 		fmt.Println(err)
@@ -38,30 +31,56 @@ func newVaultik(encodingKey string) {
 		fmt.Println(err)
 		return
 	}
+}
 
+func getVaultikData() *vaultik {
+	f, err := openVaultikInHomeDir()
+
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+
+	buf := make([]byte, 128)
+	_, err = f.Read(buf)
+
+	s := string(buf)
+	return &vaultik{encodingKey: s}
 }
 
 //setValue key is the actual key to identify the entry.
 func (v *vaultik) setValue(key, value string) error {
-
-	if vault == nil {
-		return errors.New("vault is nil, please run vaultik init -k [key]")
+	// get user home dir
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
 	}
 
-	//check if the file exists
-	_, err := os.OpenFile(key, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	err = os.Mkdir(filepath.Join(home, "secure"), 0755)
+
+	//TODO check this error and dismiss when file exists => os.IsExist(err)
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println()
+	}
+
+	p := filepath.Join(home, "secure", filepath.Base(key))
+
+	// check if the file exists. But not append anything, just overwrite.
+	varFile, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, 0666)
 
 	if err != nil {
 		return err
 	}
 
+	//encrypt the value with the encoding key
 	encrypted, err := encrypt(v.encodingKey, value)
 
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(key, []byte(encrypted), 0755)
+	_, err = varFile.Write([]byte(encrypted))
 
 	if err != nil {
 		return err
@@ -111,6 +130,12 @@ func (v *vaultik) read(key string) (string, error) {
 	return decrypted, nil
 }
 
-func openVaultik() {
+func openVaultikInHomeDir() (*os.File, error) {
+	s, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+	p := filepath.Join(s, filepath.Base(".vaultik"))
 
+	return os.OpenFile(p, os.O_CREATE|os.O_WRONLY, 0644)
 }

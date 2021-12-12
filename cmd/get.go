@@ -10,9 +10,9 @@ var getCmd = &cobra.Command{
 	Short: "Get the value, the cipher encodingKey is needed",
 	Long:  `Get the value, the cipher encodingKey is needed (Long)`,
 	Run: func(cmd *cobra.Command, args []string) {
-
+		vault := getVaultikData()
 		if len(args) == 0 {
-			fmt.Println("Please provide a key")
+			fmt.Println("please provide a key")
 			return
 		}
 
@@ -21,7 +21,7 @@ var getCmd = &cobra.Command{
 		res, err := vault.getValue(key)
 
 		if err != nil {
-			fmt.Println(fmt.Sprintf("error: %s, please try again", err.Error()))
+			fmt.Println(fmt.Sprintf("error: %v, please try again", err))
 			return
 		}
 
