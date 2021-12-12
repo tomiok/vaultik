@@ -6,9 +6,9 @@ import (
 )
 
 var setCmd = &cobra.Command{
-	Use:   "set",
-	Short: "Set the value and save it in the file system, the encodingKey and filename are required",
-	Long:  `Set the value and save it in the file system, the encodingKey and filename are required (Long)`,
+	Use:   "set {key} {value} | the key will be used as the name for the file.",
+	Short: "",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		vault := getVaultikData()
 
