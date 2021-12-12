@@ -18,7 +18,7 @@ var setCmd = &cobra.Command{
 		}
 
 		if err := vault.setValue(args[0], args[1]); err != nil {
-			fmt.Println(fmt.Printf("error: %v, please try again", err))
+			fmt.Println(fmt.Sprintf("error: %v, please try again", err))
 			return
 		}
 	},

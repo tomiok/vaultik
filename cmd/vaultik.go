@@ -44,8 +44,7 @@ func getVaultikData() *vaultik {
 	buf := make([]byte, 128)
 	_, err = f.Read(buf)
 
-	s := string(buf)
-	return &vaultik{encodingKey: s}
+	return &vaultik{encodingKey: string(buf)}
 }
 
 //setValue key is the actual key to identify the entry.
@@ -56,18 +55,19 @@ func (v *vaultik) setValue(key, value string) error {
 		return err
 	}
 
-	err = os.Mkdir(filepath.Join(home, "secure"), 0755)
+	err = os.Mkdir(filepath.Join(home, "secure"), os.ModePerm)
 
-	//TODO check this error and dismiss when file exists => os.IsExist(err)
 	if err != nil {
-		fmt.Println(err.Error())
-		fmt.Println()
+		if !os.IsExist(err) {
+			return err
+		}
 	}
 
 	p := filepath.Join(home, "secure", filepath.Base(key))
 
+	fmt.Println(fmt.Sprintf("directory created: %s", p))
 	// check if the file exists. But not append anything, just overwrite.
-	varFile, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, 0666)
+	varFile, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
 
 	if err != nil {
 		return err
@@ -106,7 +106,7 @@ func (v *vaultik) getValue(key string) (string, error) {
 
 // read the entire file, returns the values decrypted. The key is the file name
 func (v *vaultik) read(key string) (string, error) {
-	_, err := os.OpenFile(key, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	_, err := os.OpenFile(key, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
 	if err != nil {
 		return "", err
 	}
@@ -137,5 +137,5 @@ func openVaultikInHomeDir() (*os.File, error) {
 	}
 	p := filepath.Join(s, filepath.Base(".vaultik"))
 
-	return os.OpenFile(p, os.O_CREATE|os.O_WRONLY, 0644)
+	return os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
 }
