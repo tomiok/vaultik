@@ -6,11 +6,6 @@ import (
 	"os"
 )
 
-var (
-	filename    string
-	encodingKey string
-)
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "vaultik",
@@ -36,5 +31,5 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&encodingKey, "encodingKey", "k", "", "Encoding key")
+	//rootCmd.PersistentFlags().StringVarP(nil, "encodingKey", "k", "", "Encoding key")
 }
