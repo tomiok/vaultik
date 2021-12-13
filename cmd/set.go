@@ -10,7 +10,7 @@ var setCmd = &cobra.Command{
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		vault := getVaultikData()
+		vault := getVaultikData(false)
 
 		if len(args) < 2 {
 			fmt.Println("please provide the key and de actual API key")

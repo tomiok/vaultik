@@ -33,7 +33,7 @@ func newVaultik(encodingKey string) {
 	}
 }
 
-func getVaultikData() *vaultik {
+func getVaultikData(decrypted bool) *vaultik {
 	f, err := openVaultikInHomeDir()
 
 	if err != nil {
@@ -106,6 +106,7 @@ func (v *vaultik) getValue(key string) (string, error) {
 
 // read the entire file, returns the values decrypted. The key is the file name
 func (v *vaultik) read(key string) (string, error) {
+	//TODO find in secure directory
 	_, err := os.OpenFile(key, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
 	if err != nil {
 		return "", err
