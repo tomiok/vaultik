@@ -33,7 +33,7 @@ func newVaultik(encodingKey string) {
 	}
 }
 
-func getVaultikData(decrypted bool) *vaultik {
+func getVaultikData() *vaultik {
 	f, err := openVaultikInHomeDir()
 
 	if err != nil {
