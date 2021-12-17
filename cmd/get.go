@@ -12,7 +12,6 @@ var getCmd = &cobra.Command{
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(decrypted)
 		vault := getVaultikData()
 		if len(args) == 0 {
 			fmt.Println("please provide a key")
@@ -21,18 +20,7 @@ var getCmd = &cobra.Command{
 
 		key := args[0]
 
-		res, err := vault.getValue(key)
-
-		if decrypted {
-			dec, err := decrypt(vault.encodingKey, res)
-
-			if err != nil {
-				fmt.Println(fmt.Sprintf("cannot process decrypt %s", err.Error()))
-				return
-			}
-
-			fmt.Println(dec)
-		}
+		res, err := vault.getValue(key, decrypted)
 
 		if err != nil {
 			fmt.Println(fmt.Sprintf("error: %v, please try again", err))

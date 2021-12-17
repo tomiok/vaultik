@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,6 +11,10 @@ import (
 var (
 	errNotFound  = errors.New("key not found")
 	errFileEmpty = errors.New("file is empty")
+)
+
+const (
+	dirSecure = "secure"
 )
 
 type vaultik struct {
@@ -55,7 +58,7 @@ func (v *vaultik) setValue(key, value string) error {
 		return err
 	}
 
-	err = os.Mkdir(filepath.Join(home, "secure"), os.ModePerm)
+	err = os.Mkdir(filepath.Join(home, dirSecure), os.ModePerm)
 
 	if err != nil {
 		if !os.IsExist(err) {
@@ -63,7 +66,7 @@ func (v *vaultik) setValue(key, value string) error {
 		}
 	}
 
-	p := filepath.Join(home, "secure", filepath.Base(key))
+	p := filepath.Join(home, dirSecure, filepath.Base(key))
 
 	fmt.Println(fmt.Sprintf("directory created: %s", p))
 	// check if the file exists. But not append anything, just overwrite.
@@ -91,10 +94,10 @@ func (v *vaultik) setValue(key, value string) error {
 
 //getValue key is the actual key to identify the entry, return the encrypted/encoded value and an error (nil if any
 // problem occurred).
-func (v *vaultik) getValue(key string) (string, error) {
+func (v *vaultik) getValue(key string, decrypted bool) (string, error) {
 
 	// key-values
-	value, err := v.read(key)
+	value, err := v.read(key, decrypted)
 
 	if err != nil {
 		return "", err
@@ -105,30 +108,36 @@ func (v *vaultik) getValue(key string) (string, error) {
 }
 
 // read the entire file, returns the values decrypted. The key is the file name
-func (v *vaultik) read(key string) (string, error) {
-	//TODO find in secure directory
-	_, err := os.OpenFile(key, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
+func (v *vaultik) read(key string, decrypted bool) (string, error) {
+	// get user home dir
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
 
-	b, err := ioutil.ReadFile(key)
+	p := filepath.Join(home, dirSecure, filepath.Base(key))
+	fmt.Println(p)
+	res, err := os.ReadFile(p)
 
 	if err != nil {
 		return "", err
 	}
 
-	if len(b) == 0 {
+	if len(res) == 0 {
 		return "", errNotFound
 	}
 
-	decrypted, err := decrypt(v.encodingKey, string(b))
+	if decrypted {
+		d, err := decrypt(v.encodingKey, string(res))
 
-	if err != nil {
-		return "", err
+		if err != nil {
+			return "", err
+		}
+
+		return d, nil
 	}
 
-	return decrypted, nil
+	return string(res), nil
 }
 
 func openVaultikInHomeDir() (*os.File, error) {
