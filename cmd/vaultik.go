@@ -116,7 +116,7 @@ func (v *vaultik) read(key string, decrypted bool) (string, error) {
 	}
 
 	p := filepath.Join(home, dirSecure, filepath.Base(key))
-	fmt.Println(p)
+
 	res, err := os.ReadFile(p)
 
 	if err != nil {
