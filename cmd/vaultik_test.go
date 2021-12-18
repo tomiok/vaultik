@@ -6,7 +6,7 @@ import (
 )
 
 func Test_SetValue(t *testing.T) {
-	vault := newVaultik("someKey", "C:\\Users\\Tomás\\Downloads\\keys.txt")
+	vault := getVaultikData()
 
 	err := vault.setValue("twitter_api_key415", "someImp0rt4ntK3y123")
 
@@ -14,7 +14,7 @@ func Test_SetValue(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 
-	res, err := vault.getValue("twitter_api_key414")
+	res, err := vault.getValue("twitter_api_key415", false)
 
 	if err != nil {
 		t.Log(err.Error())
@@ -22,12 +22,4 @@ func Test_SetValue(t *testing.T) {
 	}
 
 	fmt.Println(res)
-}
-
-func Test_readAll(t *testing.T) {
-	vault := newVaultik("someKey", "C:\\Users\\Tomás\\Downloads\\keys.txt")
-
-	s, err := vault.read()
-	fmt.Println(s)
-	fmt.Println(err)
 }
