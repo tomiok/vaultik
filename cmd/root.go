@@ -11,7 +11,7 @@ var rootCmd = &cobra.Command{
 	Use:     "vaultik",
 	Short:   "A brief description of your application",
 	Long:    `this is VAULTIK, a CLI interface for add variables in a secure way`,
-	Example: "",
+	Example: "vaultik init this_is_a_secure_key",
 }
 
 func Execute() {
@@ -19,17 +19,8 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	// tests flags
-	if b, _ := rootCmd.Flags().GetBool("help"); b {
-		fmt.Print("toggled2")
-	}
-
-	if s, _ := rootCmd.Flags().GetString("example"); s == "test" {
-		fmt.Print("example2")
-	}
 }
 
 func init() {
-	//rootCmd.PersistentFlags().StringVarP(nil, "encodingKey", "k", "", "Encoding key")
+
 }
