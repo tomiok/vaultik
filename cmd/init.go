@@ -5,9 +5,9 @@ import (
 )
 
 var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "",
-	Long:  ``,
+	Use:   "init {cipher key}",
+	Short: "init the vaultik",
+	Long:  `init the vaultik`,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		newVaultik(args[0])
