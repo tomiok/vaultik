@@ -25,13 +25,13 @@ func newVaultik(encodingKey string) {
 	f, err := openVaultikInHomeDir()
 
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 		return
 	}
 	_, err = f.Write([]byte(encodingKey))
 
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 		return
 	}
 }
@@ -147,5 +147,12 @@ func openVaultikInHomeDir() (*os.File, error) {
 	}
 	p := filepath.Join(s, filepath.Base(".vaultik"))
 
-	return os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	f, err :=  os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+
+	if err != nil {
+		panic(err)
+		return nil, err
+	}
+
+	return f, nil
 }
