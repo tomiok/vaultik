@@ -13,7 +13,7 @@ var allCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		vault := getVaultikData()
 
-		err := vault.readAll()
+		err := vault.printAll()
 
 		if err != nil {
 			fmt.Println(fmt.Sprintf("cannot read values: %s", err.Error()))

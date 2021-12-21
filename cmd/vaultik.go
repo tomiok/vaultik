@@ -88,7 +88,7 @@ func (v *vaultik) setValue(key, value string) error {
 		return err
 	}
 
-	saveInAllFile(key, value)
+	saveInAllFile(key, encrypted)
 	fmt.Println("file created")
 	return nil
 }
@@ -100,9 +100,8 @@ func saveInAllFile(key, value string) {
 		fmt.Println(fmt.Sprintf("cannot create ALL properties file. %s", _err.Error()))
 		return
 	}
-	entry := key + "\t" + value + "\n"
+	entry := "+ " + key + "\t" + "|"  + "\t" + value + " +\n"
 	_, _err = f.Write([]byte(entry))
-
 	if _err != nil {
 		fmt.Println(fmt.Sprintf("cannot writing in ALL properties file. %s", _err.Error()))
 		return
@@ -157,7 +156,7 @@ func (v *vaultik) read(key string, decrypted bool) (string, error) {
 	return string(res), nil
 }
 
-func (v *vaultik) readAll() error {
+func (v *vaultik) printAll() error {
 	s, err := os.UserHomeDir()
 	if err != nil {
 		return err
