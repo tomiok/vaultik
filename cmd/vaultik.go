@@ -68,7 +68,6 @@ func (v *vaultik) setValue(key, value string) error {
 
 	p := filepath.Join(home, dirSecure, filepath.Base(key))
 
-	fmt.Println(fmt.Sprintf("directory created: %s", p))
 	// check if the file exists. But not append anything, just overwrite.
 	varFile, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
 
@@ -89,7 +88,25 @@ func (v *vaultik) setValue(key, value string) error {
 		return err
 	}
 
+	saveInAllFile(key, value)
+	fmt.Println("file created")
 	return nil
+}
+
+func saveInAllFile(key, value string) {
+	f, _err := createAllPropsFile()
+
+	if _err != nil {
+		fmt.Println(fmt.Sprintf("cannot create ALL properties file. %s", _err.Error()))
+		return
+	}
+	entry := key + "\t" + value + "\n"
+	_, _err = f.Write([]byte(entry))
+
+	if _err != nil {
+		fmt.Println(fmt.Sprintf("cannot writing in ALL properties file. %s", _err.Error()))
+		return
+	}
 }
 
 //getValue key is the actual key to identify the entry, return the encrypted/encoded value and an error (nil if any
@@ -140,6 +157,33 @@ func (v *vaultik) read(key string, decrypted bool) (string, error) {
 	return string(res), nil
 }
 
+func (v *vaultik) readAll() error {
+	s, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	p := filepath.Join(s, dirSecure, filepath.Base(".all"))
+
+	b, err := os.ReadFile(p)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(b))
+	return nil
+}
+
+func createAllPropsFile() (*os.File, error) {
+	s, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+	p := filepath.Join(s, dirSecure, filepath.Base(".all"))
+
+	return os.OpenFile(p, os.O_CREATE|os.O_APPEND|os.O_WRONLY, os.ModePerm)
+}
+
 func openVaultikInHomeDir() (*os.File, error) {
 	s, err := os.UserHomeDir()
 	if err != nil {
@@ -147,7 +191,7 @@ func openVaultikInHomeDir() (*os.File, error) {
 	}
 	p := filepath.Join(s, filepath.Base(".vaultik"))
 
-	f, err :=  os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	f, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
 
 	if err != nil {
 		panic(err)
