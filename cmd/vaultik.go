@@ -100,7 +100,7 @@ func saveInAllFile(key, value string) {
 		fmt.Println(fmt.Sprintf("cannot create ALL properties file. %s", _err.Error()))
 		return
 	}
-	entry := "+ " + key + "\t" + "|"  + "\t" + value + " +\n"
+	entry := fmt.Sprintf("+ %s\t|\t%s +\n", key, value)
 	_, _err = f.Write([]byte(entry))
 	if _err != nil {
 		fmt.Println(fmt.Sprintf("cannot writing in ALL properties file. %s", _err.Error()))
