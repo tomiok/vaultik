@@ -1,6 +1,6 @@
 # Vaultik project
 
-### A tool for (AVOID) environment variables for application properties.
+### A secret manager tool to AVOID environment variables for application properties.
 
 ## Commands
 
@@ -9,4 +9,4 @@
 * get (get key's value)
 * del (delete a key)
 * export (export to another terminal)
-* read-all (decrypted with key and value) (v0.2.0)
+* read-all (decrypted with key and value, in chronological order but could show old and deleted secrets)
