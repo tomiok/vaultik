@@ -5,7 +5,7 @@
 ## Commands
 
 * init (init the vault)
-* set (add a key)
+* set (upsert -add or update- a key)
 * get (get key's value)
 * del (delete a key)
 * export (export to another terminal)
