@@ -5,9 +5,8 @@ import (
 	"io/ioutil"
 )
 
-// PrivateKey Loads a private and public key from "path" and returns an SSH ClientConfig to authenticate with the server
-// i.e. client `Config, _ := auth.PrivateKey("username", "/path/to/rsa/key", ssh.InsecureIgnoreHostKey())`
-func PrivateKey(username string, path string, keyCallBack ssh.HostKeyCallback) (ssh.ClientConfig, error) {
+// withPrivateKey connect ssh session with user and password
+func withPrivateKey(username string, path string, keyCallBack ssh.HostKeyCallback) (ssh.ClientConfig, error) {
 	privateKey, err := ioutil.ReadFile(path)
 
 	if err != nil {
@@ -29,8 +28,19 @@ func PrivateKey(username string, path string, keyCallBack ssh.HostKeyCallback) (
 	}, nil
 }
 
-// PrivateKeyWithPassphrase Creates the configuration for a client that authenticates with a password protected private key
-func PrivateKeyWithPassphrase(username string, passPhrase []byte, path string, keyCallBack ssh.HostKeyCallback) (ssh.ClientConfig, error) {
+// withPassword connect ssh session with user and password
+func withPassword(username string, password string, keyCallBack ssh.HostKeyCallback) ssh.ClientConfig {
+	return ssh.ClientConfig{
+		User: username,
+		Auth: []ssh.AuthMethod{
+			ssh.Password(password),
+		},
+		HostKeyCallback: keyCallBack,
+	}
+}
+
+// withPrivateKeyWithPassphrase Creates the configuration for a client that authenticates with a password protected private key
+func withPrivateKeyWithPassphrase(username string, passPhrase []byte, path string, keyCallBack ssh.HostKeyCallback) (ssh.ClientConfig, error) {
 	privateKey, err := ioutil.ReadFile(path)
 
 	if err != nil {

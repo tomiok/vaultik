@@ -195,17 +195,17 @@ func ParseResponse(reader io.Reader) (Response, error) {
 		return Response{}, err
 	}
 
-	response_type := buffer[0]
+	resType := buffer[0]
 	message := ""
-	if response_type > 0 {
-		buffered_reader := bufio.NewReader(reader)
-		message, err = buffered_reader.ReadString('\n')
+	if resType > 0 {
+		bufferedReader := bufio.NewReader(reader)
+		message, err = bufferedReader.ReadString('\n')
 		if err != nil {
 			return Response{}, err
 		}
 	}
 
-	return Response{response_type, message}, nil
+	return Response{resType, message}, nil
 }
 
 func (r *Response) IsOk() bool {
@@ -229,4 +229,48 @@ func (r *Response) IsFailure() bool {
 // GetMessage returns the message the remote sent back
 func (r *Response) GetMessage() string {
 	return r.Message
+}
+
+///////////////////
+// client config //
+///////////////////
+
+func NewClient(host string, config *ssh.ClientConfig) Client {
+	return NewConfig(host, config).Create()
+}
+
+//ClientConfig is the set of variables for the ssh client
+type ClientConfig struct {
+	host         string
+	clientConfig *ssh.ClientConfig
+	session      *ssh.Session
+	timeout      time.Duration
+	remoteBinary string
+}
+
+// NewConfig Creates a new client config.
+// It takes the required parameters: the host and the ssh.ClientConfig and
+// returns a config populated with the default values for the optional
+// parameters.
+//
+// These optional parameters can be set by using the methods provided on the
+// ClientConfig struct.
+func NewConfig(host string, config *ssh.ClientConfig) *ClientConfig {
+	return &ClientConfig{
+		host:         host,
+		clientConfig: config,
+		timeout:      0, // no timeout by default
+		remoteBinary: "scp",
+	}
+}
+
+// Create Builds a client with the configuration stored within the ClientConfigurer
+func (c *ClientConfig) Create() Client {
+	return Client{
+		Host:         c.host,
+		ClientConfig: c.clientConfig,
+		Timeout:      c.timeout,
+		RemoteBinary: c.remoteBinary,
+		Session:      c.session,
+	}
 }
