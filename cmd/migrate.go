@@ -18,7 +18,7 @@ var migrateCmd = &cobra.Command{
 
 		username := args[0]
 		access := args[1]
-		host := args[3]
+		host := args[2]
 
 		if method == "" {
 			sshClientConfig := withPassword(username, access, nil)

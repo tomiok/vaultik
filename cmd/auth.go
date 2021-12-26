@@ -7,6 +7,10 @@ import (
 
 // withPrivateKey connect ssh session with user and password
 func withPrivateKey(username string, path string, keyCallBack ssh.HostKeyCallback) (ssh.ClientConfig, error) {
+	if keyCallBack == nil {
+		keyCallBack = ssh.InsecureIgnoreHostKey()
+	}
+
 	privateKey, err := ioutil.ReadFile(path)
 
 	if err != nil {
@@ -30,6 +34,10 @@ func withPrivateKey(username string, path string, keyCallBack ssh.HostKeyCallbac
 
 // withPassword connect ssh session with user and password
 func withPassword(username string, password string, keyCallBack ssh.HostKeyCallback) ssh.ClientConfig {
+	if keyCallBack == nil {
+		keyCallBack = ssh.InsecureIgnoreHostKey()
+	}
+
 	return ssh.ClientConfig{
 		User: username,
 		Auth: []ssh.AuthMethod{
