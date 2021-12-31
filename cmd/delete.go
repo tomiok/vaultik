@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
-	"path/filepath"
 )
 
 var delCmd = &cobra.Command{
@@ -26,13 +25,11 @@ var delCmd = &cobra.Command{
 }
 
 func deleteFile(key string) error {
-	home, err := os.UserHomeDir()
+	p, err := getSecretPath(key)
 
 	if err != nil {
-		return err
+		return nil
 	}
-
-	p := filepath.Join(home, dirSecure, key)
 
 	return os.Remove(p)
 }

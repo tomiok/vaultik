@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 var (
@@ -52,13 +51,7 @@ func getVaultikData() *vaultik {
 
 //setValue key is the actual key to identify the entry.
 func (v *vaultik) setValue(key, value string) error {
-	// get user home dir
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
-	err = os.Mkdir(filepath.Join(home, dirSecure), os.ModePerm)
+	err := createSecretDirectory()
 
 	if err != nil {
 		if !os.IsExist(err) {
@@ -66,10 +59,7 @@ func (v *vaultik) setValue(key, value string) error {
 		}
 	}
 
-	p := filepath.Join(home, dirSecure, filepath.Base(key))
-
-	// check if the file exists. But not append anything, just overwrite.
-	varFile, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	varFile, err := getOrCreateSecureFile(key)
 
 	if err != nil {
 		return err
@@ -111,7 +101,6 @@ func saveInAllFile(key, value string) {
 //getValue key is the actual key to identify the entry, return the encrypted/encoded value and an error (nil if any
 // problem occurred).
 func (v *vaultik) getValue(key string, decrypted bool) (string, error) {
-
 	// key-values
 	value, err := v.read(key, decrypted)
 
@@ -125,15 +114,7 @@ func (v *vaultik) getValue(key string, decrypted bool) (string, error) {
 
 // read the entire file, returns the values decrypted. The key is the file name
 func (v *vaultik) read(key string, decrypted bool) (string, error) {
-	// get user home dir
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	p := filepath.Join(home, dirSecure, filepath.Base(key))
-
-	res, err := os.ReadFile(p)
+	res, err := readSecureFile(key)
 
 	if err != nil {
 		return "", err
@@ -157,13 +138,7 @@ func (v *vaultik) read(key string, decrypted bool) (string, error) {
 }
 
 func (v *vaultik) printAll() error {
-	s, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	p := filepath.Join(s, dirSecure, filepath.Base(".all"))
-
-	b, err := os.ReadFile(p)
+	b, err := readSecureFile(".all")
 
 	if err != nil {
 		return err
@@ -174,26 +149,19 @@ func (v *vaultik) printAll() error {
 }
 
 func createAllPropsFile() (*os.File, error) {
-	s, err := os.UserHomeDir()
+	p, err := getSecretPath(".all")
+
 	if err != nil {
 		return nil, err
 	}
-	p := filepath.Join(s, dirSecure, filepath.Base(".all"))
 
 	return os.OpenFile(p, os.O_CREATE|os.O_APPEND|os.O_WRONLY, os.ModePerm)
 }
 
 func openVaultikInHomeDir() (*os.File, error) {
-	s, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
-	p := filepath.Join(s, filepath.Base(".vaultik"))
-
-	f, err := os.OpenFile(p, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	f, err := getOrCreateSecureFile(".vaultik")
 
 	if err != nil {
-		panic(err)
 		return nil, err
 	}
 
