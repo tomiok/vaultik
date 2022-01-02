@@ -62,7 +62,7 @@ func encrypt(key, value string) (string, error) {
 }
 
 func decrypt(key, cipherText string) (string, error) {
-	// get a 128 bit key
+	// get a 128-bit key
 	cipherKey, err := reduce(key)
 	if err != nil {
 		return "", err

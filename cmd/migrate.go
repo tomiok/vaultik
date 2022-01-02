@@ -16,24 +16,38 @@ import (
 var method string
 
 var migrateCmd = &cobra.Command{
-	Use:     "migrate {user} {path to id_rsa} {destination} [-m=privateKey]",
+	Use:     "migrate {user} {path to id_rsa/password} {destination} {remoteURL} [-m=privateKey]",
 	Short:   "migrate should send in scp protocol all the secured and hashed pair of key-values",
 	Long:    ``,
-	Example: "migrate tomas p45w0rd1 example.com:22",
-	Args:    cobra.MinimumNArgs(3),
+	Example: "migrate tomas [p45w0rd1 || ] /home/secure example.com:22",
+	Args:    cobra.MinimumNArgs(4),
 	Run: func(cmd *cobra.Command, args []string) {
 
 		username := args[0]
 		access := args[1]
-		host := args[2]
+		destination := args[2]
+		host := args[3]
 
+		var client *ssh.Client
+		var err error
 		if method == "" {
-
+			cfg := withPassword(username, access, nil)
+			client, err = ssh.Dial("tcp", host, &cfg)
 		} else {
-			cfg, _ := withPrivateKey(username, access, nil)
-			client, _ := ssh.Dial("tcp", host, &cfg)
-			walk(client)
+			cfg, err := withPrivateKey(username, access, nil)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			client, err = ssh.Dial("tcp", host, &cfg)
 		}
+
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+
+		walk(destination, client)
 	},
 }
 
@@ -44,7 +58,7 @@ func init() {
 	rootCmd.AddCommand(migrateCmd)
 }
 
-func walk(client *ssh.Client) {
+func walk(destination string, client *ssh.Client) {
 	p, err := getSecretDirectory()
 
 	if err != nil {
@@ -75,37 +89,49 @@ func walk(client *ssh.Client) {
 		sess, _ := client.NewSession()
 		wg.Add(1)
 		go func(name string) {
-			doCopy(&wg, p, name, name, sess)
+			err = doCopy(&wg, p, name, filepath.Join(destination, name), sess)
+
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			fmt.Println(fmt.Sprintf("migrating secure file %s ", name))
 		}(file.Name())
 	}
 	wg.Wait()
 }
 
-func doCopy(wg *sync.WaitGroup, p, name, destination string, sess *ssh.Session) {
+func doCopy(wg *sync.WaitGroup, p, name, destination string, sess *ssh.Session) error {
 	defer wg.Done()
 	join := filepath.Join(p, name)
-	CopyPath(join, destination, sess)
+	return copyPath(join, destination, sess)
 }
 
-func CopyPath(filePath, destinationPath string, session *ssh.Session) error {
+func copyPath(filePath, destinationPath string, session *ssh.Session) error {
 	f, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 	s, err := f.Stat()
+
 	if err != nil {
 		return err
 	}
+
 	return copyFile(s.Size(), s.Mode().Perm(), path.Base(filePath), f, destinationPath, session)
 }
 
 func copyFile(size int64, mode os.FileMode, fileName string, contents io.Reader, destination string, session *ssh.Session) error {
-	defer session.Close()
+	defer func() {
+		_ = session.Close()
+	}()
+
 	w, err := session.StdinPipe()
 
 	if err != nil {
-		fmt.Println("err2: " + err.Error())
 		return err
 	}
 
@@ -115,16 +141,16 @@ func copyFile(size int64, mode os.FileMode, fileName string, contents io.Reader,
 		return err
 	}
 
-		errors := make(chan error)
+	errors := make(chan error)
 
 	go func() {
-			errors <- session.Wait()
+		errors <- session.Wait()
 	}()
 
-	fmt.Fprintf(w, "C%#o %d %s\n", mode, size, fileName)
-	io.Copy(w, contents)
-	fmt.Fprint(w, "\x00")
-	w.Close()
+	_, _ = fmt.Fprintf(w, "C%#o %d %s\n", mode, size, fileName)
+	_, _ = io.Copy(w, contents)
+	_, _ = fmt.Fprint(w, "\x00")
+	_ = w.Close()
 
 	return <-errors
 }
