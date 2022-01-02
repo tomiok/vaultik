@@ -27,6 +27,17 @@ func createSecretDirectory() error {
 	return os.Mkdir(filepath.Join(home, dirSecure), os.ModePerm)
 }
 
+func getSecretDirectory() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	p := filepath.Join(home, dirSecure)
+
+	return p, nil
+}
+
 func getOrCreateSecureFile(key string) (*os.File, error) {
 	p, err := getSecretPath(key)
 	if err != nil {

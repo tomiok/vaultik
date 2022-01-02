@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/ssh"
@@ -61,6 +62,7 @@ func (a *Client) CopyFromFile(file os.File, remotePath string, permissions strin
 // Access copied bytes by providing a PassThru reader factory
 func (a *Client) Copy(r io.Reader, remotePath string, permissions string, size int64) error {
 	stdout, err := a.Session.StdoutPipe()
+	ctx := context.Background()
 	if err != nil {
 		return err
 	}
@@ -120,8 +122,14 @@ func (a *Client) Copy(r io.Reader, remotePath string, permissions string, size i
 		}
 	}()
 
-	if waitTimeout(&wg, a.Timeout) {
-		return errors.New("timeout when upload files")
+	if a.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, a.Timeout)
+		defer cancel()
+	}
+
+	if err := wait(&wg, ctx); err != nil {
+		return err
 	}
 
 	close(errCh)
@@ -133,28 +141,19 @@ func (a *Client) Copy(r io.Reader, remotePath string, permissions string, size i
 	return nil
 }
 
-// waitTimeout waits for the waitgroup for the specified max timeout.
-// Returns true if waiting timed out.
-func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
+func wait(wg *sync.WaitGroup, ctx context.Context) error {
 	c := make(chan struct{})
 	go func() {
 		defer close(c)
 		wg.Wait()
 	}()
-	if timeout > 0 {
-		timer := time.NewTimer(timeout)
-		defer timer.Stop()
 
-		select {
-		case <-c:
-			return false // completed normally
-		case <-timer.C:
-			return true // timed out
-		}
-	} else {
-		// only wait for waitgroup to complete
-		<-c
-		return false
+	select {
+	case <-c:
+		return nil
+
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 }
 
@@ -259,7 +258,7 @@ func NewConfig(host string, config *ssh.ClientConfig) *ClientConfig {
 	return &ClientConfig{
 		host:         host,
 		clientConfig: config,
-		timeout:      0, // no timeout by default
+		timeout:      2 * time.Minute, // no timeout by default
 		remoteBinary: "scp",
 	}
 }
