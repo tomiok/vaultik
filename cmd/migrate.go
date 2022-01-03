@@ -27,7 +27,7 @@ var migrateCmd = &cobra.Command{
 		access := args[1]
 		destination := args[2]
 		host := args[3]
-
+///////////////////////////// TODO contar y mostrar CUANTOS files se migraron
 		var client *ssh.Client
 		var err error
 		if method == "" {
