@@ -27,7 +27,7 @@ var migrateCmd = &cobra.Command{
 		access := args[1]
 		destination := args[2]
 		host := args[3]
-///////////////////////////// TODO contar y mostrar CUANTOS files se migraron
+		///////////////////////////// TODO contar y mostrar CUANTOS files se migraron
 		var client *ssh.Client
 		var err error
 		if method == "" {
@@ -47,7 +47,9 @@ var migrateCmd = &cobra.Command{
 			return
 		}
 
-		walk(destination, client)
+		count := walk(destination, client)
+
+		fmt.Println(fmt.Sprintf("%d files migrated", count))
 	},
 }
 
@@ -58,26 +60,27 @@ func init() {
 	rootCmd.AddCommand(migrateCmd)
 }
 
-func walk(destination string, client *ssh.Client) {
+func walk(destination string, client *ssh.Client) int {
+	var count int
 	p, err := getSecretDirectory()
 
 	if err != nil {
 		fmt.Println(fmt.Sprintf("cannot get secret dir dir %s", err.Error()))
-		return
+		return count
 	}
 
 	f, err := os.Open(p)
 
 	if err != nil {
 		fmt.Println(fmt.Sprintf("cannot get secret dir dir %s", err.Error()))
-		return
+		return count
 	}
 
 	files, err := f.ReadDir(0)
 
 	if err != nil {
 		fmt.Println(fmt.Sprintf("cannot get secret dir dir %s", err.Error()))
-		return
+		return count
 	}
 	var wg sync.WaitGroup
 
@@ -99,6 +102,7 @@ func walk(destination string, client *ssh.Client) {
 		}(file.Name())
 	}
 	wg.Wait()
+	return 0
 }
 
 func doCopy(wg *sync.WaitGroup, p, name, destination string, sess *ssh.Session) error {
