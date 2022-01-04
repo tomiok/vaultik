@@ -100,9 +100,10 @@ func walk(destination string, client *ssh.Client) int {
 			}
 			fmt.Println(fmt.Sprintf("migrating secure file %s ", name))
 		}(file.Name())
+		count++
 	}
 	wg.Wait()
-	return 0
+	return count
 }
 
 func doCopy(wg *sync.WaitGroup, p, name, destination string, sess *ssh.Session) error {
