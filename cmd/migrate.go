@@ -98,7 +98,7 @@ func walk(destination string, client *ssh.Client) int {
 				fmt.Println(err.Error())
 				return
 			}
-			fmt.Println(fmt.Sprintf("migrating secure file %s ", name))
+			fmt.Println(fmt.Sprintf("migrating secured file: %s ", name))
 		}(file.Name())
 		count++
 	}
