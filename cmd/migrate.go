@@ -12,7 +12,8 @@ import (
 	"sync"
 )
 
-// method is for
+// method is for choose the authentication mode for the ssh connection. At zero value is user and password,
+// and used with the value privateKey, the path to the private key should be given instead of the actual password.
 var method string
 
 var migrateCmd = &cobra.Command{
@@ -27,7 +28,7 @@ var migrateCmd = &cobra.Command{
 		access := args[1]
 		destination := args[2]
 		host := args[3]
-		///////////////////////////// TODO contar y mostrar CUANTOS files se migraron
+
 		var client *ssh.Client
 		var err error
 		if method == "" {

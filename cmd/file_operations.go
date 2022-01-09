@@ -1,3 +1,5 @@
+//+build
+
 package cmd
 
 import (
